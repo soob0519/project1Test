@@ -1,0 +1,48 @@
+
+ *****************************************************************
+ *
+ *Program Name: PGM1
+ *
+ *Program Language:  RPG
+ *
+ *Description: This sample program illustrates the incorrect
+ *             way of using the error code parameter.
+ *
+ *Header Files Included: QUSEC - Error Code Parameter
+ *
+ *APIs Used:  QUSCRTUS - Create User Space
+ *
+ *****************************************************************
+ * BRING IN THE ERROR STRUCTURE FROM QSYSINC
+I/COPY QSYSINC/QRPGSRC,QUSEC
+ **
+ISPCNAM      DS
+I I            'SPCNAME   '              1  10 SPC
+I I            'PAM       '             11  20 LIB
+ ** OTHER ASSORTED VARIABLES
+I            DS
+I I            2000                  B   1   40SIZ
+I                                    B   5   80START
+I I            X'00'                     9   9 INTVAL
+ *
+ * Initialize the bytes provided field (QUSBNDB) of the error code
+ * structure.  Languages such as RPG and CL tend to initialize the bytes
+ * provided field to blanks, which when passed to an API is viewed as a
+ * very large (and incorrect) binary value.  If you receive CPF3CF1 when
+ * calling an API, the bytes provided field should be the first field
+ * you examine as part of problem determination.
+C                     Z-ADD16        QUSBNB               (3)
+ *
+ * CREATE THE SPACE TO HOLD THE DATA
+C                     CALL 'QUSCRTUS'
+C                     PARM           SPCNAM
+C                     PARM 'EXT_ATTR'EXTATR 10
+C                     PARM           SIZ
+C                     PARM           INTVAL
+C                     PARM '*ALL    'PUBAUT 10
+C                     PARM 'NO TEXT 'TXTDSC 50
+C                     PARM '*XXXXXXX'REPLAC 10            (1)
+C                     PARM           QUSBN
+ ** Program does not check the error code parameter       (5)
+ **
+C                     SETON                     LR
